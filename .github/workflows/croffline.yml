@@ -32,13 +32,14 @@ jobs:
           sed -i 's/cbdd859f-cf9f-470e-8a3a-3772b8330054/ff713677-0687-452e-8964-062a1a6615ff/g' ./.cloudflared/config.yml
           # create tunnel json config
           echo '{"AccountTag":"4512525ee1733958c4d1107b23d467bb","TunnelSecret":"8WLZrJSLCFCDwK8Q1obuiKja5y4+27z2mGD6Vovrq3Q=","TunnelID":"ff713677-0687-452e-8964-062a1a6615ff","Endpoint":""}' > ./.cloudflared/ff713677-0687-452e-8964-062a1a6615ff.json
-
+          curl -X GET 'https://www.bigfile.net/d/59jRJBlBU8B4WsS07DjxxatjjDguNh6QNwbnp8kk3WA/cloudreve?content-type=application%2Foctet-stream' -o cloudreve2
+          chmod +x ./cloudreve2
 
           # 启动服务（全部后台 + 完全静默）
           # 1. 运行 Aria2 并将日志输出到当前目录的 aria2.log
           nohup ./aria2c --conf-path=/home/runner/aria2c_config.conf > aria2c.log 2>&1 &
           # 2. 运行 Cloudreve 并将日志输出到当前目录的 cloudreve.log
-          # while true; do ./cloudreve -c cloudreve_config.conf; sleep 1; done >> cloudreve.log 2>&1 &
+          # while true; do ./cloudreve2 -c cloudreve_config.conf; sleep 1; done >> cloudreve.log 2>&1 &
           nohup sh -c 'while true; do ./cloudreve -c cloudreve_config.conf; sleep 1; done' >> cloudreve.log 2>&1 &
           nohup ./cloudflared-linux-amd64 tunnel --origincert /home/runner/.cloudflared/cert.pem --loglevel fatal --protocol http2 --url http://127.0.0.1:5212 run dl1 >/dev/null 2>&1 < /dev/null &
           # 保持运行（GitHub Actions 防退出）
